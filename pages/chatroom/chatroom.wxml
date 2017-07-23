@@ -1,0 +1,60 @@
+<!--chatroom.wxml-->
+<view class="container">
+  <view wx:if="{{recordStatus != RecordStatus.HIDE}}" class="modal modal-record" bindtap="toggleRecordModal">
+    <view class="modal-body" catchtap="toggleWithoutAction">
+      <text class="desc">{{RecordDesc[recordStatus]}}</text>
+      <view class="dot" catchtouchstart="handleRecording" catchtouchmove="handleRecordingMove" catchtouchend="handleRecordingCancel" catchtouchcancel="handleRecordingCancel">
+        <image class="icon-mic" src="../../images/mic@2x.png" />
+      </view>
+    </view>
+  </view>
+  <scroll-view scroll-y="true" class="scroll_view" class="{{ view }}" bindtap="cancelEmoji" scroll-into-view="{{ toView }}">
+    <view class="message" wx:for="{{ chatMsg }}" wx:key="" id="{{ item.mid }}">
+      <view class="time">
+        <text>{{item.time}}</text>
+      </view>
+      <view class="message_main" class="{{ item.style }}">
+        <view class="user">
+          <text>{{ item.username }}</text>
+        </view>
+        <image class="avatar" src="../../images/number.png" />
+        <view class="msg">
+          <view wx:if="{{ item.msg.type == 'img' || item.msg.type == 'audio' }}">
+            <template is="{{ item.msg.type }}" data="{{ item, msgView }}" />
+          </view>
+          <view wx:elif="{{ item.msg.type == 'txt' }}">
+            <view class="template" wx:for="{{ item.msg.data }}" wx:key="">
+              <template is="{{ item.type }}" data="{{ item }}" />
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </scroll-view>
+
+  <view class="room_bar">
+        <form bindreset="cleanInput">
+            <view class="f-row">
+                <input wx:if="{{!showRecordHandler}}" class="f news" type="text" value="{{ inputMessage }}"
+                       placeholder="输入新消息" placeholder-style="color:#CFCFCF;padding-left:5px;" bindinput="bindMessage"
+                       bindtap="focus" bindfocus="focus" confirm-type="send" bindconfirm="sendMessage1"/>
+                <button wx:else class="f btn-recording" catchtouchstart="handleRecording"
+                        catchtouchend="handleRecordingCancel" catchtouchcancel="handleRecordingCancel">按住 说话
+                </button>
+                <view class="v-record" bindtap="toggleRecordModal">
+                <image class="icon-record"
+                       src="{{recordStatus != RecordStatus.HIDE ? '../../images/iconAudioActive@2x.png' : '../../images/iconAudio@2x.png'}}"/>
+            </view>
+                <button class="send_btn" bindtap="sendMessage" formType="reset">发送</button>
+            </view>
+        </form>
+    </view>
+</view>
+
+
+<template name="txt">
+  <text style="float: left;margin-top: 2px;">{{ item.data }}</text>
+</template>
+<template name="audio">
+  <image bindtap="playRecord" data-mid="{{item.mid}}" data-url="{{item.msg.url}}" class="icon-play" src="{{ msgView[item.mid].isPlay? '../../images/audioPause.png' : '../../images/audioPlay.png'}}"/>
+</template>
